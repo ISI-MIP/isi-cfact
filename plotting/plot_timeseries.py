@@ -27,7 +27,7 @@ def plot_timeseries(
     ds = pd.to_datetime(nct[:], unit="D", origin=pd.Timestamp(nct.units.lstrip("days since")))
 
     lat_dir = data_dir / runid / "timeseries" / variable / f"lat_{lat}"
-    file = data_dir / runid / "timeseries" / variable / f"lat_{lat}" / f"ts_GSWP3_lat{lat}_lon{lon}.h5"
+    file = data_dir / runid / "timeseries" / variable / f"lat_{lat}" / f"ts_{dataset}_lat{lat}_lon{lon}.h5"
     df = pd.read_hdf(file)
     # set index to be dates
     df["ds"] = ds
