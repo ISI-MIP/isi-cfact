@@ -9,14 +9,61 @@ as we aim to compare impact events of the past (for which we have data) to the e
 
 1. We approximate the change in past climate through a model with three parts. Long-term trend, an ever-repeating yearly cycle, and a trend in the yearly cycle. Trends are induced by global mean temperature change. We use a Bayesian approach to estimate all parameters of the model and their dependencies at once, here implemented through pymc3. Yearly cycle and trend in yearly cycles are approximated through a finite number of modes, which are periodic in the year. The parameter distributions tell us which part of changes in the variables can be explained through global mean temperature as a direct driver.
 
-2. We do quantile mapping to map each value from the observed dataset to a value that we expect it would have been without the climate-induced trend. Our hierachical model approach provides us with a time evolution of our distribution through the time evolution of a gmt-dependent parameter.
-We first this time-evolving distribution to map each value to its quantile in this time evolving distribution.
-We then use the distribution from a reference period in the beginning of our dataset where we assume that climate change did not play a role, to remap the quantile to value of the variable. This value is our counterfactual value. Quantile mapping is different for each day of the year because our model is sensitive to the yearly cycle and the trend in the yearly cycle
+2. We do quantile mapping to map each value from the observed dataset to a value that we expect it would have been without the climate-induced trend. Our hierarchical model approach provides us with a time evolution of our distribution through the time evolution of a gmt-dependent parameter.
+We first use this time-evolving distribution to map each value to its quantile in this time evolving distribution.
+We then use the distribution from a reference period in the beginning of our dataset where we assume that climate change did not play a role, to remap the quantile to a value of the variable. This value is our counterfactual value. Quantile mapping is different for each day of the year because our model is sensitive to the yearly cycle and the trend in the yearly cycle.
 
 The following graph illustrates the approach. Grey is the original data, red is our estimation of change. Blue is the original data minus the parts that were estimated to driven by global mean temperature change.
 
 ![Counterfactual example](image01.png)
 
+### Variables
+
+| Variable | Short name | Unit | Statistical model |
+| -------- | ---------- | ---- | ----------------- |
+| Near-Surface Air Temperature | tas | K | Gaussian |
+| | tasrange | | Bounded Gaussian |
+| | tasskew | | Bounded Gaussian |
+| Daily Minimum Near-Surface Air Temperature | tasmin | K | f(tasrange, tasskew) |
+| Daily Maximum Near-Surface Air Temperature | tasmax | K | f(tasrange, tasskew) |
+| Surface Downwelling Longwave Radiation | rlds | W / m² | Gaussian |
+| Surface Downwelling Shortwave Radiation | rsds | W / m²| Censored Gaussian |
+| Surface Air Pressure | ps | Pa | Gaussian |
+| Near-Surface Wind Speed | sfcWind | m / s | Weibull |
+| Precipitation | pr | kg / m² s | Bernoulli-Gamma |
+| Near-Surface Relative Humidity | hurs | % | Censored Gaussian |
+| Near-Surface Specific Humidity | huss | kg / kg | f(hurs, pr, tas) |
+
+## Global Mean Temperature
+Describe method to generate the global mean temperature.
+## Indirect Variables
+### Tasmin and Tasmax
+
+Following ---- we model tasrange and tasskew instead of tasmin and tasmax. Tasmin and Tasmax are then calculated from those variables with the formulas:
+
+tasmin = 
+tasmax = 
+
+### huss
+
+Huss is also not directly modeled, but generated in postprocessing from the variables tas, pr, hurs.
+huss = f(tas, pr ,hurs)
+
+## Models
+
+### Gaussian Distribution
+The variables tas, rlds, and ps are modeled with a Gaussian distribution with a time varying mean value. The mean value is a linear model of the global mean temperature change and a yearly cycle. The fourier coefficients of the yearly cycle are also a linear function of the global mean temperature.
+
+### Bounded Gaussian Distribution
+Tasrange and Tasskew are also modeled with a Gaussian distribution as described above. But those variables are boundet. tasrange must be positive and tasskew between 0 and 1. Quantile mapping might lead to values close to the boundary beeing maped to values that are outsite the defined range. To avoid this, such values are not quantile mapped s.th. the counterfactual value is the same as the historic value in that cases. Such cases are very rare, as the value has to be already close to the boundary for this to happen. /todo check if it even happens in our models
+
+### Censored Gaussian Distribution
+
+### Weibull Distribution
+
+### Mixed Bernoulli-Gamma Distribution
+
+### 
 ## Example
 
 See [here](examples/tas_example.ipynb) for a notebook leading you through the basic steps.
