@@ -34,35 +34,31 @@ The following graph illustrates the approach. Grey is the original data, red is 
 | Near-Surface Relative Humidity | hurs | % | Censored Gaussian |
 | Near-Surface Specific Humidity | huss | kg / kg | f(hurs, pr, tas) |
 
-## Models
-### Predictor
+## Model
 
-The global mean temperature is preprocessed using singular spectrum analysis. Hence, a global mean temperature timeseries 
-without yearly variations is used as predictor for the model. 
-Describe method to generate the global mean temperature.
-
-### Gaussian Distribution
+A global mean temperature timeseries 
+without yearly variations is used as predictor for the model.
+Tho generate this predictor, global mean temperature is preprocessed using singular spectrum analysis. 
 
 The variables tas, rlds, and ps are modeled with a Gaussian distribution with a time varying mean value. The mean value is a linear function of the global mean temperature change plus a yearly cycle. The fourier coefficients of the yearly cycle are also a linear function of the global mean temperature.
 
-### Bounded Gaussian Distribution
 Tasrange and Tasskew are also modeled with a Gaussian distribution as described above. But those variables are bounded. Tasrange is positive and tasskew between 0 and 1. In the quantile mapping step, values that are close to the boundary can get mapped to values outside the defined range. To avoid this, such values are not quantile mapped s.th. the counterfactual value is the same as the historic value in those cases. This happens only rarely, as the value has to be already close to the boundary which is unlikely for both variables.
-
-### Censored Gaussian Distribution
 
 The variables hurs and rsds are described with a Gaussian distribution. Those variables are bounded, hurs is between 0 and 1 and rsds is always non-negative. To avoid invalid values after quantile mapping, values that are outside the defined range after quantile mapping are reset to the closest boundary value. 
 
-### Weibull Distribution
-
 The sfcWind variable is modeled with a Weibull distribution using two parameters. 
-The shape parameter _alpha_ is assumed to be free of trend. Both parameters need to be positive. 
-Therefore, the model output is transformed with the logistic function to get only positive outputs.
+The shape parameter _alpha_ is assumed to be free of trend. 
+Both parameters need to be positive. 
+Therefore, the model output is transformed with the logistic function to produce positive outputs.
 
-### Mixed Bernoulli-Gamma Distribution
+Precipitation is modeled with a mixed Bernoulli-gamma distribution.  
+This approach enables to model the probability of rain-days and precipitation amounts on rain days with one distribution.
+The Bernoulli-gamma distribution has three parameters. All three parameters are modeled as a linear function of the global mean temperature. 
+The model does not contain a yearly cycle for any parameter. 
 
 ### Tasmin and Tasmax
 
-Following ---- we model tasrange and tasskew instead of tasmin and tasmax. Tasmin and Tasmax are then calculated from those variables with the formulas:
+Following -Lange--Piani et al- we model tasrange and tasskew instead of tasmin and tasmax. Tasmin and Tasmax are then calculated from those variables with the formulas:
 
 tasmin = 
 tasmax = 
