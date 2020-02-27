@@ -27,10 +27,9 @@ def plot_cdo_trend_maps(
     # y are the original observations, cfact the counterfactual
     fig = plt.figure()
     figname = f"trend_map.png"
-    trend_std = ncd.variables[f"{variable}_orig"][0, ::-1, ::1].std()
+    _trend = ncd.variables[f"{variable}_orig"][0, ::-1, ::1]
+    trend_std = _trend[~np.isnan(_trend)].std()
     for i, case in enumerate([f"{variable}_orig", variable]):
-        data = ncd.variables[case][:]
-        # last minus first 30 years
         trend = ncd.variables[case][0, ::-1, ::1]
         if vmax is None:
             vmax = 2
