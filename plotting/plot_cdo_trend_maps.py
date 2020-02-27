@@ -27,18 +27,19 @@ def plot_cdo_trend_maps(
     # y are the original observations, cfact the counterfactual
     fig = plt.figure()
     figname = f"trend_map.png"
+    trend_std = ncd.variables[f"{variable}_orig"][0, ::-1, ::1].std()
     for i, case in enumerate([f"{variable}_orig", variable]):
         data = ncd.variables[case][:]
         # last minus first 30 years
         trend = ncd.variables[case][0, ::-1, ::1]
         if vmax is None:
-            vmax = np.abs(trend).max()
+            vmax = 2
         vmin = -vmax
 
         ax = plt.subplot(211 + i, projection=ccrs.PlateCarree(central_longitude=0.0))
         ax.coastlines()
         img = ax.imshow(
-            trend, vmin=vmin, vmax=vmax, extent=[-180, 180, -90, 90], cmap=cmap
+            trend/trend_std, vmin=vmin, vmax=vmax, extent=[-180, 180, -90, 90], cmap=cmap
         )
         plt.colorbar(img, ax=ax, shrink=0.6)
         ax.grid()
