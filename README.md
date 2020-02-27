@@ -71,7 +71,8 @@ huss = f(tas, pr ,hurs)
 
 ## Results
 
-
+![Trend Maps](isicfact_v1.0.0_gswp3_trend_map.png)
+*Figure 2: *
 
 
 ## Example
