@@ -11,11 +11,12 @@ as we aim to compare impact events of the past (for which we have data) to the e
 
 2. We do quantile mapping to map each value from the observed dataset to a value that we expect it would have been without the climate-induced trend. Our hierarchical model approach provides us with a time evolution of our distribution through the time evolution of a gmt-dependent parameter.
 We first use this time-evolving distribution to map each value to its quantile in this time evolving distribution.
-We then use the distribution from a reference period in the beginning of our dataset where we assume that climate change did not play a role, to remap the quantile to a value of the variable. This value is our counterfactual value. Quantile mapping is different for each day of the year because our model is sensitive to the yearly cycle and the trend in the yearly cycle.
+We then use the distribution from a reference period in the beginning of our dataset where we assume that climate change did not play a role, to remap the quantile to a value of the variable. This value is our counterfactual value. Quantile mapping is different for each day of the year because our model is sensitive to the yearly cycle and the trend in the yearly cycle. This approach is illustrated in _figure 1_
 
 The following graph illustrates the approach. Grey is the original data, red is our estimation of change. Blue is the original data minus the parts that were estimated to driven by global mean temperature change.
 
 ![Counterfactual example](image01.png)
+*Figure 1: Model for a climate variable with yearly cycle. Grey is the original data, red is our estimation of change. Blue is the original data minus the parts that were estimated to driven by global mean temperature change.*
 
 ### Variables
 
