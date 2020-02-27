@@ -58,7 +58,7 @@ The model does not contain a yearly cycle for any parameter.
 
 ### Tasmin and Tasmax
 
-Following -Lange--Piani et al- we model tasrange and tasskew instead of tasmin and tasmax. Tasmin and Tasmax are then calculated from those variables with the formulas:
+Following -Lange--Piani et al- we model tasrange = tasmax - tasmin and tasskew = (tas-tasmin)/tasrange instead of tasmin and tasmax. Tasmin and Tasmax are then calculated from those variables with the formulas:
 
 tasmin = 
 tasmax = 
