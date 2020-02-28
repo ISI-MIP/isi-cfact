@@ -63,7 +63,7 @@ The Bernoulli-gamma distribution has three parameters. All three parameters are 
 The model does not contain a yearly cycle for any parameter. 
 
 ## Results
-ISI-CFACT counterfactual climate are produced for the GSWP3 and the GSWP3-W5E5 datasets. ISI-CFACT removes annual trends as well as trends in the yearly cycle. Hereby the trend is regarded with the global mean temperature as independent variable. In Figure 2 it is asserted that this method also reduces a linear trend that is calculated with time as independent variable and does not regard the yearly cylce. 
+We here present summaries of each variable for both the original data based on GSWP3 and the GSWP3-W5E5, and the corresponding counterfactual. ISI-CFACT removes annual trends as well as trends in the yearly cycle. Hereby the trend is regarded with the global mean temperature as independent variable. As a visual check, we show a map of the slope of a linear trend with time as independent variable, relative to the standard deveation of the slope in all grid-cells (see Figure 2). By construction, our method should reduce this relative slope to a value close to zero. The trend calculated for this visual check is based on a simpler method that disregards the yearly-cycle of the variables.
 ### GSWP3 
 ![Trend Maps](isicfact_v1.0.0_gswp3_trend_map.png)
 
