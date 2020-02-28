@@ -2,7 +2,7 @@
 
 ISI-CFACT produces counterfactual climate data from past datasets for the ISIMIP project.
 
-## Idea
+## Introduction
 Counterfactual climate is a hypothetical climate in a world without climate change.
 For impact models, such climate should stay as close as possible to the observed past,
 as we aim to compare impact events of the past (for which we have data) to the events in the counterfactual. The difference between past impacts and counterfactual impacts is a proxy for the impacts caused by climate change. We run the following steps:
@@ -23,17 +23,18 @@ The following graph illustrates the approach. Grey is the original data, red is 
 | Variable | Short name | Unit | Statistical model |
 | -------- | ---------- | ---- | ----------------- |
 | Near-Surface Air Temperature | tas | K | Gaussian |
-| Auxiliary Variable for Tasmin and Tasmax| tasrange | | Bounded Gaussian |
-| Auxiliary Variable for Tasmin and Tasmax| tasskew | | Bounded Gaussian |
-| Daily Minimum Near-Surface Air Temperature | tasmin | K | f(tasrange, tasskew) |
-| Daily Maximum Near-Surface Air Temperature | tasmax | K | f(tasrange, tasskew) |
+| Range of daily temperature | tasrange | K | Bounded Gaussian |
+| Skewness of daily temperature | tasskew | 1 | Bounded Gaussian |
+| Daily Minimum Near-Surface Air Temperature | tasmin | K | Derived from tas, tasrange and tasskew |
+| Daily Maximum Near-Surface Air Temperature | tasmax | K | Derived from tas, tasrange and tasskew |
 | Surface Downwelling Longwave Radiation | rlds | W / m² | Gaussian |
 | Surface Downwelling Shortwave Radiation | rsds | W / m²| Censored Gaussian |
 | Surface Air Pressure | ps | Pa | Gaussian |
 | Near-Surface Wind Speed | sfcWind | m / s | Weibull |
 | Precipitation | pr | kg / m² s | Bernoulli-Gamma |
 | Near-Surface Relative Humidity | hurs | % | Censored Gaussian |
-| Near-Surface Specific Humidity | huss | kg / kg | f(hurs, pr, tas) |
+| Near-Surface Specific Humidity | huss | kg / kg | Derived from hurs ps and tas |
+*Table 1: Specs of climate variables for the ISIMIP3b counterfactual climate datasets. The variables tasrange and tasskew are auxiliary variables to calculate tasmin and tasmax* 
 
 ## Model
 
@@ -59,10 +60,7 @@ The model does not contain a yearly cycle for any parameter.
 
 ### Tasmin and Tasmax
 
-Following -Lange--Piani et al- we model tasrange = tasmax - tasmin and tasskew = (tas-tasmin)/tasrange instead of tasmin and tasmax. Tasmin and Tasmax are then calculated from those variables with the formulas:
-
-tasmin = 
-tasmax = 
+To avoid large relative errors in the daily temperature range as pointed out by Piani et al. (2010), we de-trend the daily temperature range tasrange = tasmax - tasmin and the skewness of the daily temperature tasskew = (tas-tasmin)/tasrange and derive tasmin and tasmax from tas, tasrange and tasskew.
 
 ### huss
 
@@ -70,9 +68,10 @@ Huss is also not directly modeled, but generated in postprocessing from the vari
 huss = f(tas, pr ,hurs)
 
 ## Results
-
+ISI-CFACT counterfactual climate are produced for the GSWP3 and the GSWP3-W5E5 datasets. ISI-CFACT removes annual trends as well as trends in the yearly cycle. Hereby the trend is regarded with the global mean temperature as independent variable. In Figure 2 it is asserted that this method also reduces a linear trend that is calculated with time as independent variable and does not regard the yearly cylce. 
+### GSWP3 
 ![Trend Maps](isicfact_v1.0.0_gswp3_trend_map.png)
-*Figure 2: *
+*Figure 2: Maps of linear trends in historical (left) and counterfactual (right) climate for the GSWP3 dataset. The linear trends for hurs, huss, pr, ps, rlds, rsds and sfcWind are calculated with time as independent variable and without a yearly cycle. The grid-cell show the slope of that trend relative to the standard deviation of the slope in all grid-cells* 
 
 
 ## Example
