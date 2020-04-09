@@ -13,18 +13,19 @@ if user == "mengel":
 
 elif user == "sitreu":
     # conda_path = "/home/sitreu/.conda/envs/mpi_py3"
-    # data_dir = "/home/sitreu/Documents/PIK/CounterFactuals/isi-cfact/"
-    data_dir = "/p/tmp/sitreu/isimip/isi-cfact"
+    data_dir = "/home/sitreu/Documents/PIK/CounterFactuals/isi-cfact/"
+    # data_dir = "/p/tmp/sitreu/isimip/isi-cfact"
     log_dir = "./log"
 
 input_dir = Path(data_dir) / "input"
 # make output dir same as cwd. Helps if running more than one job.
 output_dir = Path(data_dir) / "output" / Path.cwd().name
+output_dir_extended = output_dir + "_EXTENDED"
 
 # max time in sec for sampler for a single grid cell.
-timeout = 60 * 60
+timeout = 240 * 60
 # tas, tasrange pr, prsn, prsnratio, ps, rlds, wind, hurs
-variable = "pr"  # select variable to detrend
+variable = "tas"  # select variable to detrend
 
 # number of modes for fourier series of model, only relevant if mu or sigma model
 # include yearly cycles
@@ -33,10 +34,11 @@ modes = [1, 1, 1, 1]
 inference = "NUTS"
 
 seed = 0  # for deterministic randomisation
-subset = 10  # only use every subset datapoint for bayes estimation for speedup
+subset = 1  # only use every subset datapoint for bayes estimation for speedup
 
 # out of "watch+wfdei", "GSWP3", "GSWP3+ERA5"
 dataset = "GSWP3"
+dataset_extended = f"{dataset}_EXTENDED"
 # use a dataset with only subset spatial grid points for testing
 lateral_sub = 80
 
@@ -46,9 +48,11 @@ lateral_sub = 80
 qm_ref_period = ["1901-01-01", "1904-12-31"]
 
 gmt_file = dataset.lower() + "_ssa_gmt.nc4"
+gmt_file_extended= dataset_extended.lower() + "_ssa_gmt.nc4"
 landsea_file = "ISIMIP2b_landseamask_generic_sub" + str(lateral_sub) + ".nc4"
 # source_file = variable + "_" + dataset + "_sub.nc4"
 source_file = variable + "_" + dataset + "_sub" + str(lateral_sub) + ".nc4"
+source_file_extended = variable + "_" + dataset_extended + "_sub" + str(lateral_sub) + ".nc4"
 cfact_file = variable + "_" + dataset + "_cfactual.nc4"
 # .h5 or .csv
 storage_format = ".h5"

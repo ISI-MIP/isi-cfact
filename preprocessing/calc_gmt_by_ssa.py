@@ -24,7 +24,8 @@ output_dir = output_base / dataset
 
 input_file = output_dir / Path("tas_" + dataset.lower() + "_merged.nc4")
 mean_file = str(input_file).replace("_merged.nc4","_gmt.nc4")
-ssa_file = str(input_file).replace("/tas_","")
+ssa_file = str(input_file).replace("tas_","")
+ssa_file = str(input_file).replace("_gmt","_ssa_gmt")
 
 cmd = "module load cdo && cdo fldmean "+str(input_file)+" "+str(mean_file)
 print(cmd)
