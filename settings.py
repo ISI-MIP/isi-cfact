@@ -20,7 +20,7 @@ elif user == "sitreu":
 input_dir = Path(data_dir) / "input"
 # make output dir same as cwd. Helps if running more than one job.
 output_dir = Path(data_dir) / "output" / Path.cwd().name
-output_dir_extended = output_dir + "_EXTENDED"
+output_dir_extended = Path(str(output_dir) + "-EXTENDED")
 
 # max time in sec for sampler for a single grid cell.
 timeout = 240 * 60
@@ -38,7 +38,7 @@ subset = 1  # only use every subset datapoint for bayes estimation for speedup
 
 # out of "watch+wfdei", "GSWP3", "GSWP3+ERA5"
 dataset = "GSWP3"
-dataset_extended = f"{dataset}_EXTENDED"
+dataset_extended = f"{dataset}-EXTENDED"
 # use a dataset with only subset spatial grid points for testing
 lateral_sub = 80
 

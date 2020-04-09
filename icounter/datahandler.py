@@ -87,6 +87,59 @@ def create_dataframe(nct_array, units, data_to_detrend, gmt, variable):
 
     return tdf, datamin, scale
 
+def create_dataframe_extended(nct_array, 
+                              units, 
+                              data_nonextended, 
+                              data_extended,
+                              gmt_nonextended,
+                              gmt_extended,
+                              variable):
+
+    # proper dates plus additional time axis that is
+    # from 0 to 1 for better sampling performance
+
+    ds = pd.to_datetime(
+        nct_array, unit="D", origin=pd.Timestamp(units.lstrip("days since"))
+    )
+
+    # todo combine old and new gmt
+
+    t_scaled = (ds - ds.min()) / (ds.max() - ds.min())
+    gmt_on_data_cal = np.interp(t_scaled, np.linspace(0, 1, len(gmt)), gmt)
+
+    # todo implement rescaling based on the nonextended data
+    # f_scale = c.mask_and_scale["gmt"][0]
+    # gmt_scaled, _, _ = f_scale(gmt_on_data_cal, "gmt")
+    # c.check_bounds(data_to_detrend, variable)
+    # try:
+    #     f_scale = c.mask_and_scale[variable][0]
+    # except KeyError as error:
+    #     print(
+    #         "Error:",
+    #         variable,
+    #         "is not implement (yet). Please check if part of the ISIMIP set.",
+    #     )
+    #     raise error
+    # y_scaled, datamin, scale = f_scale(pd.Series(data_to_detrend), variable)
+
+    tdf = pd.DataFrame(
+        {
+            "ds": ds,
+            "t": t_scaled,
+            "y_nonextended": data_nonextended,
+            "y_nonextended_scaled": y_nonextended_scaled,
+            "y_extended": data_extended,
+            "y_extended_scaled": y_extended_scaled,
+            "gmt_extended": gmt_on_data_cal,
+            "gmt_extended_scaled": gmt_scaled,
+        }
+    )
+    if variable == "pr":
+        raise NotImplementedError('extension for precipitation is not implemented yet')
+        # tdf["is_dry_day"] = np.isnan(y_scaled)
+
+    return tdf, datamin, scale
+
 
 def create_ref_df(df, trace_for_qm, ref_period, params):
 

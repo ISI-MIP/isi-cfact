@@ -4,6 +4,9 @@ import icounter
 import icounter.estimator as est
 import icounter.datahandler as dh
 import netCDF4 as nc
+import pandas as pd
+import numpy as np
+from datetime import datetime
 
 # todo logging
 
@@ -28,23 +31,22 @@ gmt_file = s.input_dir / s.dataset / s.gmt_file
 with nc.Dataset(gmt_file, "r") as ncg:
     gmt = np.squeeze(ncg.variables["tas"][:])
 
-
 with nc.Dataset(s.input_dir / s.dataset_extended / s.gmt_file_extended,
-        "r") as ncg:
+                "r") as ncg:
     gmt_extended = np.squeeze(ncg.variables["tas"][:])
-    
+
 input_file_extended = s.input_dir / s.dataset_extended / s.source_file_extended.lower()
 landsea_mask_file = s.input_dir / s.landsea_file
 
 # load extended data
-obs_data = nc.Dataset(input_file, "r")
+obs_data = nc.Dataset(input_file_extended, "r")
 nc_lsmask = nc.Dataset(landsea_mask_file, "r")
 nct = obs_data.variables["time"]
-lats = obs_data.varialbes["lat"][:]
+lats = obs_data.variables["lat"][:]
 lons = obs_data.variables["lon"][:]
 
 longrid, latgrid = np.meshgrid(lons, lats)
-jgrid, igrid = np.meshgrid(np.arange(len(lons)), 
+jgrid, igrid = np.meshgrid(np.arange(len(lons)),
                            np.arange(len(lats)))
 
 ls_mask = nc_lsmask.variables["LSM"][0, :]
@@ -72,15 +74,16 @@ assert calls_per_arrayjob.sum() == len(df_specs)
 # Calculate the starting and ending values for this task based
 # on the SLURM task and the number of runs per task.
 cum_calls_per_arrayjob = calls_per_arrayjob.cumsum(dtype=int)
-start_num = 0 if task_id == 0 else cum_calls_per_arrayjob[task_id-1]
+start_num = 0 if task_id == 0 else cum_calls_per_arrayjob[task_id - 1]
 end_num = cum_calls_per_arrayjob[task_id] - 1
 run_numbers = np.arange(start_num, end_num + 1, 1, dtype=np.int)
 if len(run_numbers) == 0:
-    print ("No runs assigned for this SLURM task.")
+    print("No runs assigned for this SLURM task.")
 else:
     print("This is SLURM task", task_id, "which will do runs", start_num, "to", end_num)
 
-extend = ext.extend(s)
+# todo implement ext.extend(s)
+# extend = ext.extend(s)
 
 TIME0 = datetime.now()
 for n in run_numbers[:]:
@@ -91,19 +94,30 @@ for n in run_numbers[:]:
     outdir_for_cell = dh.make_cell_output_dir(
         s.output_dir_extended, "timeseries", sp["lat"], sp["lon"], s.variable
     )
-    fname_cell = outdir_for_cell / f"ts_{settings.dataset_extended}_lat{sp['lat']}_lon{sp['lon']}{s.storage_format}"
+    fname_cell = outdir_for_cell / f"ts_{s.dataset_extended}_lat{sp['lat']}_lon{sp['lon']}{s.storage_format}"
 
-     if s.skip_if_data_exists:
-            try:
-                dh.test_if_data_valid_exists(fname_cell)
-                print(f"Existing valid data in {fname_cell} . Skip calculation.")
-                continue
-            except Exception as e:
-                print(e)
-                print("No valid data found. Run calculation.")
+    if s.skip_if_data_exists:
+        try:
+            dh.test_if_data_valid_exists(fname_cell)
+            print(f"Existing valid data in {fname_cell} . Skip calculation.")
+            continue
+        except Exception as e:
+            print(e)
+            print("No valid data found. Run calculation.")
 
     data = obs_data.variables[s.variable][:, sp["index_lat"], sp["index_lon"]]
-    # todo load nonextended calculated data
+    # load nonextended calculated data
+    indir_for_cell = s.output_dir / "timeseries" / s.variable / f"lat_{sp['lat']}"
+    infile_fname_cell = dh.get_cell_filename(indir_for_cell,
+                                             sp['lat'],
+                                             sp['lon'],
+                                             s)
+    # try:
+    df_nonextended = pd.read_hdf(infile_fname_cell)
+    # except:
+    # log an error message and skip
+    # todo skip if file does not exist
+
     # todo implement create_dataframe_extended
     df, datamin, scale = dh.create_dataframe_extended(nct[:], nct.units, data, gmt, s.variable)
     # todo calculat parameters for old dataset
@@ -118,4 +132,4 @@ print("Estimation completed for all cells." +
       "It took {0:.1f} minutes.".format((datetime.now() - TIME0).total_seconds() / 60)
       )
 
-    
+
