@@ -43,16 +43,17 @@ def check_bounds(data, variable):
         raise ValueError(data.max(), "is bigger than upper bound", upper, ".")
 
 
-def scale_to_unity(data, variable):
+def scale_to_unity(data, variable, datamin=None, scale=None):
 
     """ Take a pandas Series and scale it linearly to
     lie within [0, 1]. Return pandas Series as well as the
     data minimum and the scale. """
 
-    scale = data.max() - data.min()
-    scaled_data = (data - data.min()) / scale
+    if scale is None: scale = data.max() - data.min()
+    if datamin is None: datamin = data.min()
+    scaled_data = (data - datamin) / scale
 
-    return scaled_data, data.min(), scale
+    return scaled_data, datamin, scale
 
 
 def rescale_to_original(scaled_data, datamin, scale):
@@ -62,7 +63,7 @@ def rescale_to_original(scaled_data, datamin, scale):
     return scaled_data * scale + datamin
 
 
-def scale_and_mask(data, variable):
+def scale_and_mask(data, variable, datamin=None, scale=None):
 
     print("Mask", (data <= threshold[variable][0]).sum(), "values below lower bound.")
     data[data <= threshold[variable][0]] = np.nan
@@ -74,14 +75,15 @@ def scale_and_mask(data, variable):
     except IndexError:
         pass
 
-    scale = data.max() - data.min()
+    if scale is None: scale = data.max() - data.min()
+    if datamin is None: datamin = data.min()
     scaled_data = data / scale
     print("Min, max after scaling:", scaled_data.min(), scaled_data.max())
 
-    return scaled_data, data.min(), scale
+    return scaled_data, datamin, scale
 
 
-def mask_and_scale_by_bounds(data, variable):
+def mask_and_scale_by_bounds(data, variable, datamin=None, scale=None):
 
     print("Mask", (data <= threshold[variable][0]).sum(), "values below lower bound.")
     data[data <= threshold[variable][0]] = np.nan
@@ -95,7 +97,7 @@ def mask_and_scale_by_bounds(data, variable):
     return scaled_data, 0, scale
 
 
-def scale_precip(data, variable):
+def scale_precip(data, variable, datamin=None, scale=None):
 
     data = data - threshold[variable][0]
 
@@ -104,7 +106,7 @@ def scale_precip(data, variable):
     fa, floc, fscale = stats.gamma.fit(data[~np.isnan(data)], floc=0)
     # for scipy.gamma: fscale = 1/beta
     # std = sqrt(fa/beta**2)
-    scale = fscale * fa ** 0.5
+    if scale is None: scale = fscale * fa ** 0.5
     scaled_data = data / scale
 
     print("Min, max after scaling:", scaled_data.min(), scaled_data.max())

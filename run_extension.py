@@ -1,12 +1,12 @@
 import os
 import settings as s
 import icounter
-import icounter.estimator as est
 import icounter.datahandler as dh
 import netCDF4 as nc
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from icounter.estimator import model_for_var
 
 
 # helper functions
@@ -182,17 +182,27 @@ for n in run_numbers[:]:
         np.testing.assert_allclose(df_extended.iloc[:len(df_nonextended)]['mu'],
                                    df_nonextended['mu'])
         # keep old mu value for the nonextended timeperiod
-        df_extended.iloc[:len(df_nonextended)]['mu'] = df_nonextended['mu']
-        foo = 'baa'
+        df_extended.loc[:df_nonextended.index[-1], 'mu'] = df_nonextended['mu']
+        df_extended['sigma'] = df_nonextended['sigma'].mean()
+        np.testing.assert_allclose(
+            df_extended.loc[:df_nonextended.index[-1], 'sigma'],
+            df_nonextended['sigma']
+        )
+        # todo add sigma
     # elif s.variable == 'wind':
     #     # use logit function (inverse of logistic function) first
-    #     pass
+    # todo assert extension of parameters remain valid (only for wind and pr)
     else:
         raise NotImplementedError(f'infering parameters from a trained model is not implemented for {s.variable}')
 
+
+    # estimate timeseries
+    ####################
+    # create reference dataframe
+    statmodel = model_for_var[s.variable](s.modes)
+    df_params_ref = df_extended.loc[:, [p for p in statmodel.params]]
     foo = 'baa'
 
-    # todo assert extension of parameters remain valid (only for wind and pr)
     # todo implement rescaling based on the nonextended data
     # todo get timeseries
     # assert timeseries for old data is almost similar

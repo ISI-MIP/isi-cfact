@@ -132,6 +132,15 @@ def create_dataframe_extended(nct_array,
     # todo mv asserts to a unittest
     np.testing.assert_equal(dataframe_nonextended['y_scaled'].to_numpy(), y_scaled)
 
+    dataframe_extended['y'] = data_extended
+    np.testing.assert_allclose(
+        dataframe_extended.loc[:dataframe_nonextended.index[-1], 'y'],
+        dataframe_nonextended.loc[:, 'y']
+    )
+
+    y_scaled_extended, _, _ = f_scale(dataframe_extended['y'], variable, datamin=datamin, scale=scale)
+    dataframe_extended['y_scaled'] = y_scaled_extended
+
     if variable == "pr":
         raise NotImplementedError('extension for precipitation is not implemented yet')
         # tdf["is_dry_day"] = np.isnan(y_scaled)
