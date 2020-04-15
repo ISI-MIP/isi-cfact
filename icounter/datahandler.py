@@ -89,56 +89,54 @@ def create_dataframe(nct_array, units, data_to_detrend, gmt, variable):
 
 def create_dataframe_extended(nct_array, 
                               units, 
-                              data_nonextended, 
+                              dataframe_nonextended,
                               data_extended,
-                              gmt_nonextended,
-                              gmt_extended,
+                              last_gmt_value,
                               variable):
-
-    # proper dates plus additional time axis that is
-    # from 0 to 1 for better sampling performance
 
     ds = pd.to_datetime(
         nct_array, unit="D", origin=pd.Timestamp(units.lstrip("days since"))
     )
 
-    # todo combine old and new gmt
+    # take old gmt up to the last index in the old dataframe. Take the last gmt_value in the new dataframe.
+    # Interpolate linearly between the last gmt value of the old timeseries
+    # and the last gmt value of the new datafram.
+    dataframe_extended = pd.DataFrame(data={'gmt': np.nan}, index=ds)
+    dataframe_extended['gmt'] = dataframe_nonextended['gmt']
+    dataframe_extended.iloc[-1]['gmt'] = last_gmt_value
+    dataframe_extended.interpolate(inplace=True)
+    # assert gmt is equal up to the extended period
+    # todo mv asserts to a unittest
+    np.testing.assert_allclose(dataframe_nonextended['gmt'],
+                               dataframe_extended.loc[:dataframe_nonextended.index[-1], 'gmt'])
 
-    t_scaled = (ds - ds.min()) / (ds.max() - ds.min())
-    gmt_on_data_cal = np.interp(t_scaled, np.linspace(0, 1, len(gmt)), gmt)
+    # rescale gmt
+    shift = dataframe_nonextended['gmt'].min()
+    scale = dataframe_nonextended['gmt'].max() - dataframe_extended['gmt'].min()
+    dataframe_extended['gmt_scaled'] = (dataframe_extended['gmt'] - shift) / scale
+    # todo mv asserts to a unittest
+    np.testing.assert_allclose(dataframe_nonextended['gmt_scaled'],
+                               dataframe_extended.loc[:dataframe_nonextended.index[-1], 'gmt_scaled'])
+    # todo test rescaling for all variables
+    c.check_bounds(data_extended, variable)
+    try:
+        f_scale = c.mask_and_scale[variable][0]
+    except KeyError as error:
+        print(
+            "Error:",
+            variable,
+            "is not implement (yet). Please check if part of the ISIMIP set.",
+        )
+        raise error
+    y_scaled, datamin, scale = f_scale(dataframe_nonextended['y'], variable)
+    # todo mv asserts to a unittest
+    np.testing.assert_equal(dataframe_nonextended['y_scaled'].to_numpy(), y_scaled)
 
-    # todo implement rescaling based on the nonextended data
-    # f_scale = c.mask_and_scale["gmt"][0]
-    # gmt_scaled, _, _ = f_scale(gmt_on_data_cal, "gmt")
-    # c.check_bounds(data_to_detrend, variable)
-    # try:
-    #     f_scale = c.mask_and_scale[variable][0]
-    # except KeyError as error:
-    #     print(
-    #         "Error:",
-    #         variable,
-    #         "is not implement (yet). Please check if part of the ISIMIP set.",
-    #     )
-    #     raise error
-    # y_scaled, datamin, scale = f_scale(pd.Series(data_to_detrend), variable)
-
-    tdf = pd.DataFrame(
-        {
-            "ds": ds,
-            "t": t_scaled,
-            "y_nonextended": data_nonextended,
-            "y_nonextended_scaled": y_nonextended_scaled,
-            "y_extended": data_extended,
-            "y_extended_scaled": y_extended_scaled,
-            "gmt_extended": gmt_on_data_cal,
-            "gmt_extended_scaled": gmt_scaled,
-        }
-    )
     if variable == "pr":
         raise NotImplementedError('extension for precipitation is not implemented yet')
         # tdf["is_dry_day"] = np.isnan(y_scaled)
 
-    return tdf, datamin, scale
+    return dataframe_extended, datamin, scale
 
 
 def create_ref_df(df, trace_for_qm, ref_period, params):

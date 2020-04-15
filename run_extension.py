@@ -8,6 +8,38 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
+
+# helper functions
+def get_fourier_series(t, nmodes, gmt):
+    tau = lambda t, k: t * k * 2 * np.pi / 365.25
+    fourier_series = [np.ones_like(t), gmt[t]]
+    for k in range(1, nmodes+1):
+        fourier_series += [np.sin(tau(t, k)), gmt[t] * np.sin(tau(t, k)), np.cos(tau(t, k)), gmt[t] * np.cos(tau(t, k))]
+    return fourier_series
+
+def infer_model_params(gmt, t, y, n_modes):
+    """
+    infers model parameters by solving a system of linear equations at random indices.
+    This is not deterministic
+    """
+    x = None
+    break_index = 0
+    while (x is None):
+        n = 2 + n_modes * 4
+        time_samples = np.random.randint(low=0, high=len(gmt), size=n)
+        a = np.empty((n, n))
+        for i, t in enumerate(time_samples):
+            a[i, :] = get_fourier_series(t, n_modes, gmt)
+            b = np.array([y[t] for t in time_samples])
+            try:
+                x = np.linalg.solve(a, b)
+            except np.linalg.LinAlgError:
+                break_index += 1
+                if break_index == 100:
+                    raise TimeoutError('more than 100 linalg errors')
+    return x
+
+
 # todo logging
 
 print("Version", icounter.__version__)
@@ -27,23 +59,19 @@ except KeyError:
 dh.create_output_dirs(s.output_dir_extended)
 
 # load files
-gmt_file = s.input_dir / s.dataset / s.gmt_file
-with nc.Dataset(gmt_file, "r") as ncg:
-    gmt = np.squeeze(ncg.variables["tas"][:])
-
 with nc.Dataset(s.input_dir / s.dataset_extended / s.gmt_file_extended,
                 "r") as ncg:
-    gmt_extended = np.squeeze(ncg.variables["tas"][:])
+    last_gmt_value = np.squeeze(ncg.variables["tas"][:])[-1]
 
 input_file_extended = s.input_dir / s.dataset_extended / s.source_file_extended.lower()
 landsea_mask_file = s.input_dir / s.landsea_file
 
 # load extended data
-obs_data = nc.Dataset(input_file_extended, "r")
+obs_data_extended = nc.Dataset(input_file_extended, "r")
 nc_lsmask = nc.Dataset(landsea_mask_file, "r")
-nct = obs_data.variables["time"]
-lats = obs_data.variables["lat"][:]
-lons = obs_data.variables["lon"][:]
+nct = obs_data_extended.variables["time"]
+lats = obs_data_extended.variables["lat"][:]
+lons = obs_data_extended.variables["lon"][:]
 
 longrid, latgrid = np.meshgrid(lons, lats)
 jgrid, igrid = np.meshgrid(np.arange(len(lons)),
@@ -105,7 +133,7 @@ for n in run_numbers[:]:
             print(e)
             print("No valid data found. Run calculation.")
 
-    data = obs_data.variables[s.variable][:, sp["index_lat"], sp["index_lon"]]
+    data_extended = obs_data_extended.variables[s.variable][:, sp["index_lat"], sp["index_lon"]]
     # load nonextended calculated data
     indir_for_cell = s.output_dir / "timeseries" / s.variable / f"lat_{sp['lat']}"
     infile_fname_cell = dh.get_cell_filename(indir_for_cell,
@@ -114,22 +142,65 @@ for n in run_numbers[:]:
                                              s)
     # try:
     df_nonextended = pd.read_hdf(infile_fname_cell)
+    df_nonextended.set_index(df_nonextended['ds'], inplace=True)
     # except:
     # log an error message and skip
     # todo skip if file does not exist
 
     # todo implement create_dataframe_extended
-    df, datamin, scale = dh.create_dataframe_extended(nct[:], nct.units, data, gmt, s.variable)
-    # todo calculat parameters for old dataset
+    df_extended, datamin, scale = dh.create_dataframe_extended(
+        nct_array=nct[:],
+        units=nct.units,
+        dataframe_nonextended=df_nonextended,
+        data_extended=data_extended,
+        last_gmt_value=last_gmt_value,
+        variable=s.variable)
+    # case distinction for variables:
+    if s.variable in ['tas',
+                      'tasrange',
+                      'tasskew',
+                      'hurs',
+                      'ps',
+                      'rsds',
+                      'rlds']:
+        fourier_coefficients_mu = np.median(
+            np.array(
+                [infer_model_params(gmt=df_nonextended['gmt'].to_numpy(),
+                                    t=np.arange(len(df_nonextended['gmt']), dtype=np.int),
+                                    y=df_nonextended['mu'],
+                                    n_modes=s.modes[0])
+                 for i in range(1000)]),
+            axis=0)
+        fourier_coeff_matrix = fourier_coefficients_mu[:, np.newaxis].repeat(len(df_extended['gmt']), 1)
+        df_extended['mu'] = (
+                fourier_coeff_matrix *
+                np.array(get_fourier_series(t=np.arange(len(df_extended['gmt']), dtype=np.int),
+                                            nmodes=s.modes[0],
+                                            gmt=df_extended['gmt'].to_numpy()))
+        ).sum(axis=0)
+        # todo find a better cutoff
+        np.testing.assert_allclose(df_extended.iloc[:len(df_nonextended)]['mu'],
+                                   df_nonextended['mu'])
+        # keep old mu value for the nonextended timeperiod
+        df_extended.iloc[:len(df_nonextended)]['mu'] = df_nonextended['mu']
+        foo = 'baa'
+    # elif s.variable == 'wind':
+    #     # use logit function (inverse of logistic function) first
+    #     pass
+    else:
+        raise NotImplementedError(f'infering parameters from a trained model is not implemented for {s.variable}')
+
+    foo = 'baa'
+
     # todo assert extension of parameters remain valid (only for wind and pr)
+    # todo implement rescaling based on the nonextended data
     # todo get timeseries
     # assert timeseries for old data is almost similar
     # save data
-obs_data.close()
+obs_data_extended.close()
 nc_lsmask.close()
 
 print("Estimation completed for all cells." +
       "It took {0:.1f} minutes.".format((datetime.now() - TIME0).total_seconds() / 60)
       )
-
 

@@ -92,7 +92,7 @@ def mask_and_scale_by_bounds(data, variable):
     scaled_data = data / scale
     print("Scaling by bounds of variable, divide data by", scale)
     print("Min and max are", scaled_data.min(), scaled_data.max())
-    return scaled_data, data.min(), scale
+    return scaled_data, 0, scale
 
 
 def scale_precip(data, variable):
