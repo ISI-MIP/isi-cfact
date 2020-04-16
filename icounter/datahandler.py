@@ -87,6 +87,7 @@ def create_dataframe(nct_array, units, data_to_detrend, gmt, variable):
 
     return tdf, datamin, scale
 
+
 def create_dataframe_extended(nct_array, 
                               units, 
                               dataframe_nonextended,
@@ -94,30 +95,37 @@ def create_dataframe_extended(nct_array,
                               last_gmt_value,
                               variable):
 
+    if variable in ['pr', 'wind']:
+        raise NotImplementedError('extension for precipitation is not implemented yet')
+
+    # todo mv asserts to a unittest
     ds = pd.to_datetime(
         nct_array, unit="D", origin=pd.Timestamp(units.lstrip("days since"))
     )
 
-    # take old gmt up to the last index in the old dataframe. Take the last gmt_value in the new dataframe.
-    # Interpolate linearly between the last gmt value of the old timeseries
-    # and the last gmt value of the new datafram.
+    # gmt extension
+    # take old gmt up to the last index in the old time series
+    # take the last gmt_value in the new time series
+    # interpolate linearly between the last gmt value of the old time series -
+    # and the last gmt value of the new time series.
     dataframe_extended = pd.DataFrame(data={'gmt': np.nan}, index=ds)
     dataframe_extended['gmt'] = dataframe_nonextended['gmt']
     dataframe_extended.iloc[-1]['gmt'] = last_gmt_value
     dataframe_extended.interpolate(inplace=True)
     # assert gmt is equal up to the extended period
-    # todo mv asserts to a unittest
-    np.testing.assert_allclose(dataframe_nonextended['gmt'],
-                               dataframe_extended.loc[:dataframe_nonextended.index[-1], 'gmt'])
+    np.testing.assert_allclose(
+        dataframe_nonextended['gmt'],
+        dataframe_extended.loc[:dataframe_nonextended.index[-1], 'gmt']
+    )
 
     # rescale gmt
     shift = dataframe_nonextended['gmt'].min()
     scale = dataframe_nonextended['gmt'].max() - dataframe_extended['gmt'].min()
     dataframe_extended['gmt_scaled'] = (dataframe_extended['gmt'] - shift) / scale
-    # todo mv asserts to a unittest
     np.testing.assert_allclose(dataframe_nonextended['gmt_scaled'],
                                dataframe_extended.loc[:dataframe_nonextended.index[-1], 'gmt_scaled'])
-    # todo test rescaling for all variables
+
+    # get scaling parameters from the old time series
     c.check_bounds(data_extended, variable)
     try:
         f_scale = c.mask_and_scale[variable][0]
@@ -128,22 +136,21 @@ def create_dataframe_extended(nct_array,
             "is not implement (yet). Please check if part of the ISIMIP set.",
         )
         raise error
-    y_scaled, datamin, scale = f_scale(dataframe_nonextended['y'], variable)
-    # todo mv asserts to a unittest
-    np.testing.assert_equal(dataframe_nonextended['y_scaled'].to_numpy(), y_scaled)
+    _, datamin, scale = f_scale(dataframe_nonextended['y'], variable)
 
+    # add the extended climate variable
     dataframe_extended['y'] = data_extended
     np.testing.assert_allclose(
         dataframe_extended.loc[:dataframe_nonextended.index[-1], 'y'],
         dataframe_nonextended.loc[:, 'y']
     )
-
+    # rescale extended climate variable
     y_scaled_extended, _, _ = f_scale(dataframe_extended['y'], variable, datamin=datamin, scale=scale)
     dataframe_extended['y_scaled'] = y_scaled_extended
-
-    if variable == "pr":
-        raise NotImplementedError('extension for precipitation is not implemented yet')
-        # tdf["is_dry_day"] = np.isnan(y_scaled)
+    np.testing.assert_allclose(
+        dataframe_extended.loc[:dataframe_nonextended.index[-1], 'y_scaled'],
+        dataframe_nonextended.loc[:, 'y_scaled']
+    )
 
     return dataframe_extended, datamin, scale
 
@@ -223,6 +230,26 @@ def save_to_disk(df_with_cfact, fname, lat, lon, storage_format):
         df_with_cfact.to_csv(fname)
     elif storage_format == ".h5":
         df_with_cfact.to_hdf(fname, "lat_" + str(lat) + "_lon_" + str(lon), mode="w")
+    else:
+        raise NotImplementedError("choose storage format .h5 or csv.")
+
+    print("Saved timeseries to ", fname)
+
+
+def save_fourier_coefficients_to_disk(fourie_coefficients, fname, lat, lon, storage_format):
+
+    # outdir_for_cell = make_cell_output_dir(
+    #     settings.output_dir, "timeseries", lat, lon, settings.variable
+    # )
+
+    # fname = outdir_for_cell / (
+    #     "ts_" + settings.dataset + "_lat" + str(lat) + "_lon" + str(lon) + dformat
+    # )
+
+    if storage_format == ".csv":
+        fourie_coefficients.to_csv(fname)
+    elif storage_format == ".h5":
+        fourie_coefficients.to_hdf(fname, "lat_" + str(lat) + "_lon_" + str(lon), mode="w")
     else:
         raise NotImplementedError("choose storage format .h5 or csv.")
 
