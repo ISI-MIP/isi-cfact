@@ -188,7 +188,7 @@ for n in run_numbers[:]:
         ).sum(axis=0)
         # todo find a better cutoff, here we can accept some difference
         np.testing.assert_allclose(df_extended.iloc[:len(df_nonextended)]['mu'],
-                                   df_nonextended['mu'])
+                                   df_nonextended['mu'], rtol=1e-5)
         # keep old mu value for the not extended time period
         df_extended.loc[:df_nonextended.index[-1], 'mu'] = df_nonextended['mu']
         df_extended['sigma'] = df_nonextended['sigma'].mean()
