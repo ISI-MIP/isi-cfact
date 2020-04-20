@@ -230,10 +230,14 @@ for n in run_numbers[:]:
     # fill cfact_scaled as is from quantile mapping
     # for easy checking later
     df_extended.loc[:, "cfact_scaled"] = cfact_scaled
+    # this assertion should actually be exactly equal
     np.testing.assert_allclose(
         df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'],
-        df_nonextended['cfact_scaled']
+        df_nonextended['cfact_scaled'],
+        rtol=tolerance
     )
+    # keep old sigma value for the not extended time period
+    df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'] = df_nonextended['cfact_scaled']
     # rescale all scaled values back to original, invalids included
     df_extended.loc[:, "cfact"] = c.mask_and_scale[s.variable][1](df_extended.loc[:, "cfact_scaled"], datamin, scale)
     # populate invalid values originating from y_scaled with with original values
