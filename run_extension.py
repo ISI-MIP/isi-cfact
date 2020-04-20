@@ -187,7 +187,7 @@ for n in run_numbers[:]:
                                             gmt=df_extended['gmt'].to_numpy()))
         ).sum(axis=0)
         # todo find a better cutoff, here we can accept some difference
-        tolerance = 1e-6
+        tolerance = 1e-5
         np.testing.assert_allclose(df_extended.iloc[:len(df_nonextended)]['mu'],
                                    df_nonextended['mu'],
                                    atol=tolerance)
