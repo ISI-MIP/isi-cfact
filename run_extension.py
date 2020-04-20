@@ -187,17 +187,17 @@ for n in run_numbers[:]:
                                             gmt=df_extended['gmt'].to_numpy()))
         ).sum(axis=0)
         # todo find a better cutoff, here we can accept some difference
-        tolerance = 1e-5
+        tolerance = 1e-6
         np.testing.assert_allclose(df_extended.iloc[:len(df_nonextended)]['mu'],
                                    df_nonextended['mu'],
-                                   rtol=tolerance)
+                                   atol=tolerance)
         # keep old mu value for the not extended time period
         df_extended.loc[:df_nonextended.index[-1], 'mu'] = df_nonextended['mu']
         df_extended['sigma'] = df_nonextended['sigma'].mean()
         np.testing.assert_allclose(
             df_extended.loc[:df_nonextended.index[-1], 'sigma'],
             df_nonextended['sigma'],
-            rtol=tolerance
+            atol=tolerance
         )
         # keep old sigma value for the not extended time period
         df_extended.loc[:df_nonextended.index[-1], 'sigma'] = df_nonextended['sigma']
@@ -234,7 +234,7 @@ for n in run_numbers[:]:
     np.testing.assert_allclose(
         df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'],
         df_nonextended['cfact_scaled'],
-        rtol=1e-4
+        atol=tolerance
     )
     # keep old sigma value for the not extended time period
     df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'] = df_nonextended['cfact_scaled']
