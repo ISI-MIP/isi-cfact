@@ -234,7 +234,7 @@ for n in run_numbers[:]:
     np.testing.assert_allclose(
         df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'],
         df_nonextended['cfact_scaled'],
-        rtol=tolerance
+        rtol=1e-4
     )
     # keep old sigma value for the not extended time period
     df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'] = df_nonextended['cfact_scaled']
