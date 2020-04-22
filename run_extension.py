@@ -231,11 +231,20 @@ for n in run_numbers[:]:
     # for easy checking later
     df_extended.loc[:, "cfact_scaled"] = cfact_scaled
     # this assertion should actually be exactly equal
-    np.testing.assert_allclose(
-        df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'],
-        df_nonextended['cfact_scaled'],
-        atol=tolerance
-    )
+    if s.variable == 'rsds':
+        # 0 values might randomly become non zero values. That is not deterministic,
+        # Therefore df_extended and df_nonextended can diverge there.
+        np.testing.assert_allclose(
+            df_extended.loc[~(df_extended['y_scaled'].isna())].loc[:df_nonextended.index[-1], 'cfact_scaled'],
+            df_nonextended.loc[~(df_nonextended['y_scaled'].isna())]['cfact_scaled'],
+            atol=tolerance
+        )
+    else:
+        np.testing.assert_allclose(
+            df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'],
+            df_nonextended['cfact_scaled'],
+            atol=tolerance
+        )
     # keep old sigma value for the not extended time period
     df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'] = df_nonextended['cfact_scaled']
     # rescale all scaled values back to original, invalids included

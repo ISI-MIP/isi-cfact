@@ -88,7 +88,7 @@ def create_dataframe(nct_array, units, data_to_detrend, gmt, variable):
     return tdf, datamin, scale
 
 
-def create_dataframe_extended(nct_array, 
+def create_dataframe_extended(nct_array,
                               units, 
                               dataframe_nonextended,
                               data_extended,
@@ -136,17 +136,19 @@ def create_dataframe_extended(nct_array,
             "is not implement (yet). Please check if part of the ISIMIP set.",
         )
         raise error
-    _, datamin, scale = f_scale(dataframe_nonextended['y'], variable)
+    _, datamin, scale = f_scale(dataframe_nonextended.loc[:,'y'].copy(), variable)
 
+
+    # rescale extended climate variable
+    y_scaled_extended, _, _ = f_scale(pd.Series(data_extended), variable, datamin=datamin, scale=scale)
     # add the extended climate variable
     dataframe_extended['y'] = data_extended
+    dataframe_extended['y_scaled'] = y_scaled_extended.to_numpy()
+    dataframe_extended.replace([np.inf, -np.inf], np.nan, inplace=True)
     np.testing.assert_allclose(
         dataframe_extended.loc[:dataframe_nonextended.index[-1], 'y'],
         dataframe_nonextended.loc[:, 'y']
     )
-    # rescale extended climate variable
-    y_scaled_extended, _, _ = f_scale(dataframe_extended['y'], variable, datamin=datamin, scale=scale)
-    dataframe_extended['y_scaled'] = y_scaled_extended
     np.testing.assert_allclose(
         dataframe_extended.loc[:dataframe_nonextended.index[-1], 'y_scaled'],
         dataframe_nonextended.loc[:, 'y_scaled']
