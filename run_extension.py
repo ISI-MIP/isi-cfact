@@ -195,7 +195,7 @@ for n in run_numbers[:]:
             message = f'inferred mu and pymc mu differ by more then 1e-4 ' \
                       f'at lat {sp["lat"]}, lon {sp["lon"]}'
             print(message)
-            logger.log(message + f': {error}')
+            logger.error(message + f': {error}')
         # keep old mu value for the not extended time period
         df_extended.loc[:df_nonextended.index[-1], 'mu'] = df_nonextended['mu']
         df_extended['sigma'] = df_nonextended['sigma'].mean()
