@@ -255,7 +255,7 @@ for n in run_numbers[:]:
         message = f'inferred cfact and pymc cfact differ by more then 1e-4 ' \
                   f'at lat {sp["lat"]}, lon {sp["lon"]}'
         print(message)
-        logger.log(message + f': {error}')
+        logger.error(message + f': {error}')
     # keep old sigma value for the not extended time period
     df_extended.loc[:df_nonextended.index[-1], 'cfact_scaled'] = df_nonextended['cfact_scaled']
     # rescale all scaled values back to original, invalids included
