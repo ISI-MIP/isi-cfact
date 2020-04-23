@@ -186,6 +186,7 @@ for n in run_numbers[:]:
                                             n_modes=s.modes[0],
                                             gmt=df_extended['gmt'].to_numpy()))
         ).sum(axis=0)
+        # compare pymc parameter and reconstructed parameter
         tolerance = 1e-4
         try:
             np.testing.assert_allclose(df_extended.iloc[:len(df_nonextended)]['mu'],
@@ -252,7 +253,7 @@ for n in run_numbers[:]:
                 atol=tolerance
             )
     except AssertionError as error:
-        message = f'inferred cfact and pymc cfact differ by more then 1e-4 ' \
+        message = f'inferred cfact_scaled and pymc cfact_scaled differ by more then 1e-4 ' \
                   f'at lat {sp["lat"]}, lon {sp["lon"]}'
         print(message)
         logger.error(message + f': {error}')
@@ -274,10 +275,16 @@ for n in run_numbers[:]:
     print(f"There are {yminf.sum()} -Inf values from quantile mapping. Replace.")
 
     df_extended.loc[yna | yinf | yminf, "cfact"] = df_extended.loc[yna | yinf | yminf, "y"]
-    np.testing.assert_allclose(
-        df_extended.loc[:df_nonextended.index[-1], 'cfact'],
-        df_nonextended['cfact']
-    )
+    try:
+        np.testing.assert_allclose(
+            df_extended.loc[:df_nonextended.index[-1], 'cfact'],
+            df_nonextended['cfact']
+        )
+    except AssertionError as error:
+        message = f'inferred cfact and pymc cfact differ by more then 1e-4 ' \
+                  f'at lat {sp["lat"]}, lon {sp["lon"]}'
+        print(message)
+        logger.error(message + f': {error}')
     # todo: unifiy indexes so .values can be dropped
     for v in df_params.columns:
         df_extended.loc[:, v] = df_params.loc[:, v].values
