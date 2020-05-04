@@ -42,7 +42,7 @@ time = output_ds.createDimension("time", None)
 times = output_ds.createVariable("time", "f8", ("time",))
 tas = output_ds.createVariable("tas", "f8", ("time"))
 
-output_ds.description = "GMT created from daily values by SSA (10 day step)"
+output_ds.description = "GMT created from daily values by SSA (10 year step)"
 times.units = input_ds.variables["time"].units
 times.calendar = input_ds.variables["time"].calendar
 times[:] = input_ds.variables["time"][::subset]
