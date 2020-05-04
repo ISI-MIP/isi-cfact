@@ -3,8 +3,8 @@ import pymc3 as pm
 from scipy import stats
 import pandas as pd
 import theano.tensor as tt
-import icounter.logistic as l
-import icounter.distributions
+import attrici.logistic as l
+import attrici.distributions
 
 
 def det_dot(a, b):
@@ -16,7 +16,7 @@ def det_dot(a, b):
     return (a * b[None, :]).sum(axis=-1)
 
 
-class PrecipitationLongterm(icounter.distributions.BernoulliGamma):
+class PrecipitationLongterm(attrici.distributions.BernoulliGamma):
 
     """ Influence of GMT is modelled through the parameters of the Gamma
     distribution. Example: precipitation """
@@ -66,7 +66,7 @@ class PrecipitationLongterm(icounter.distributions.BernoulliGamma):
         return model
 
 
-class PrecipitationLongtermTrendSigma(icounter.distributions.BernoulliGamma):
+class PrecipitationLongtermTrendSigma(attrici.distributions.BernoulliGamma):
 
     """ Influence of GMT is modelled through the parameters of the Gamma
     distribution. Example: precipitation """
@@ -125,7 +125,7 @@ class PrecipitationLongtermTrendSigma(icounter.distributions.BernoulliGamma):
         return model
 
 
-class PrecipitationLongtermRelu(icounter.distributions.BernoulliGamma):
+class PrecipitationLongtermRelu(attrici.distributions.BernoulliGamma):
 
     """ Influence of GMT is modelled through the parameters of the Gamma
     distribution. Example: precipitation """
@@ -178,7 +178,7 @@ class PrecipitationLongtermRelu(icounter.distributions.BernoulliGamma):
         return model
 
 
-# class PrecipitationLongtermYearlycycle(icounter.distributions.BernoulliGamma):
+# class PrecipitationLongtermYearlycycle(attrici.distributions.BernoulliGamma):
 #     def __init__(self, modes):
 #         super(PrecipitationLongtermYearlycycle, self).__init__()
 #         self.modes = modes
@@ -257,7 +257,7 @@ class PrecipitationLongtermRelu(icounter.distributions.BernoulliGamma):
 #         return model
 
 
-class TasLongterm(icounter.distributions.Normal):
+class TasLongterm(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Normal distribution.
@@ -298,7 +298,7 @@ class TasLongterm(icounter.distributions.Normal):
         return model
 
 
-class TasCycle(icounter.distributions.Normal):
+class TasCycle(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Normal distribution.
@@ -350,7 +350,7 @@ class TasCycle(icounter.distributions.Normal):
         return model
 
 
-class TasCycleRelu(icounter.distributions.Normal):
+class TasCycleRelu(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Normal distribution.
@@ -408,7 +408,7 @@ class TasCycleRelu(icounter.distributions.Normal):
         return model
 
 
-class TasLogistic(icounter.distributions.Normal):
+class TasLogistic(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Normal distribution.
@@ -465,7 +465,7 @@ class TasLogistic(icounter.distributions.Normal):
         return model
 
 
-class Tas(icounter.distributions.Normal):
+class Tas(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu parameter in the Normal distribution.
@@ -514,7 +514,7 @@ class Tas(icounter.distributions.Normal):
         return model
 
 
-class TasCauchySigmaPrior(icounter.distributions.Normal):
+class TasCauchySigmaPrior(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu parameter in the Normal distribution.
@@ -562,7 +562,7 @@ class TasCauchySigmaPrior(icounter.distributions.Normal):
         return model
 
 
-class Rlds(icounter.distributions.Normal):
+class Rlds(attrici.distributions.Normal):
 
     """ Influence of GMT on longwave downwelling shortwave radiation
     is modelled through a shift of mu parameter in the Normal distribution.
@@ -610,7 +610,7 @@ class Rlds(icounter.distributions.Normal):
         return model
 
 
-class RldsConstSigma(icounter.distributions.Normal):
+class RldsConstSigma(attrici.distributions.Normal):
 
     """ Influence of GMT on longwave downwelling shortwave radiation
     is modelled through a shift of mu parameter in the Normal distribution.
@@ -658,7 +658,7 @@ class RldsConstSigma(icounter.distributions.Normal):
         return model
 
 
-class Ps(icounter.distributions.Normal):
+class Ps(attrici.distributions.Normal):
 
     """ Influence of GMT on sea level pressure (ps) is modelled through a shift of
     mu parameter in the Normal distribution.
@@ -706,7 +706,7 @@ class Ps(icounter.distributions.Normal):
         return model
 
 
-class HursBeta(icounter.distributions.Beta):
+class HursBeta(attrici.distributions.Beta):
 
     """ Influence of GMT on relative humidity (hurs) is modelled through a shift of
     mu parameter in the Normal distribution.
@@ -760,7 +760,7 @@ class HursBeta(icounter.distributions.Beta):
         return model
 
 
-class Hurs(icounter.distributions.Normal):
+class Hurs(attrici.distributions.Normal):
 
     """ Influence of GMT on relative humidity (hurs) is modelled through a shift of
     mu parameter in the Normal distribution.
@@ -816,7 +816,7 @@ class Hurs(icounter.distributions.Normal):
         return model
 
 
-class HursTrendSigma(icounter.distributions.Normal):
+class HursTrendSigma(attrici.distributions.Normal):
 
     """ Influence of GMT on relative humidity (hurs) is modelled through a shift of
     mu parameter in the Normal distribution.
@@ -880,7 +880,7 @@ class HursTrendSigma(icounter.distributions.Normal):
         return model
 
 
-class TasLogisticTrend(icounter.distributions.Normal):
+class TasLogisticTrend(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Normal distribution.
@@ -950,7 +950,7 @@ class TasLogisticTrend(icounter.distributions.Normal):
         return model
 
 
-class Tasskew(icounter.distributions.Normal):
+class Tasskew(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1006,7 +1006,7 @@ class Tasskew(icounter.distributions.Normal):
         return model
 
 
-class TasskewSigmaTrend(icounter.distributions.Normal):
+class TasskewSigmaTrend(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1070,7 +1070,7 @@ class TasskewSigmaTrend(icounter.distributions.Normal):
         return model
 
 
-class TasskewBeta(icounter.distributions.Beta):
+class TasskewBeta(attrici.distributions.Beta):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1129,7 +1129,7 @@ class TasskewBeta(icounter.distributions.Beta):
         return model
 
 
-class TasskewBetaLogistic(icounter.distributions.Beta):
+class TasskewBetaLogistic(attrici.distributions.Beta):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1183,7 +1183,7 @@ class TasskewBetaLogistic(icounter.distributions.Beta):
         return model
 
 
-class Rsds(icounter.distributions.Normal):
+class Rsds(attrici.distributions.Normal):
     """ Influence of GMT is modelled through a shift of
         mu and sigma parameters in a Beta distribution.
         """
@@ -1245,7 +1245,7 @@ class Rsds(icounter.distributions.Normal):
         return model
 
 
-class RsdsBeta(icounter.distributions.Beta):
+class RsdsBeta(attrici.distributions.Beta):
     """ Influence of GMT is modelled through a shift of
         mu and sigma parameters in a Beta distribution.
         """
@@ -1319,7 +1319,7 @@ class RsdsBeta(icounter.distributions.Beta):
         return model
 
 
-class RsdsRiceLogistic(icounter.distributions.Rice):
+class RsdsRiceLogistic(attrici.distributions.Rice):
     """ Influence of GMT is modelled through a shift of
         mu and sigma parameters in a Beta distribution.
         """
@@ -1394,7 +1394,7 @@ class RsdsRiceLogistic(icounter.distributions.Rice):
         return model
 
 
-class RsdsRice(icounter.distributions.Rice):
+class RsdsRice(attrici.distributions.Rice):
     """ Influence of GMT is modelled through a shift of
         mu and sigma parameters in a Beta distribution.
         """
@@ -1450,7 +1450,7 @@ class RsdsRice(icounter.distributions.Rice):
         return model
 
 
-class RsdsTrendSigma(icounter.distributions.Normal):
+class RsdsTrendSigma(attrici.distributions.Normal):
     """ Influence of GMT is modelled through a shift of
         mu and sigma parameters in a Beta distribution.
         """
@@ -1520,7 +1520,7 @@ class RsdsTrendSigma(icounter.distributions.Normal):
         return model
 
 
-class Tasrange(icounter.distributions.Normal):
+class Tasrange(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1580,7 +1580,7 @@ class Tasrange(icounter.distributions.Normal):
         return model
 
 
-class TasrangeSigmaTrend(icounter.distributions.Normal):
+class TasrangeSigmaTrend(attrici.distributions.Normal):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1655,7 +1655,7 @@ class TasrangeSigmaTrend(icounter.distributions.Normal):
         return model
 
 
-class TasrangeRice(icounter.distributions.Rice):
+class TasrangeRice(attrici.distributions.Rice):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1712,7 +1712,7 @@ class TasrangeRice(icounter.distributions.Rice):
         return model
 
 
-class TasrangeRiceConstSigma(icounter.distributions.Rice):
+class TasrangeRiceConstSigma(attrici.distributions.Rice):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1757,7 +1757,7 @@ class TasrangeRiceConstSigma(icounter.distributions.Rice):
         return model
 
 
-class TasrangeLogistic(icounter.distributions.Rice):
+class TasrangeLogistic(attrici.distributions.Rice):
 
     """ Influence of GMT is modelled through a shift of
     mu and sigma parameters in a Beta distribution.
@@ -1808,7 +1808,7 @@ class TasrangeLogistic(icounter.distributions.Rice):
         return model
 
 
-class Wind(icounter.distributions.Weibull):
+class Wind(attrici.distributions.Weibull):
 
     """ Influence of GMT is modelled through a shift of
     the scale parameter beta in the Weibull distribution. The shape
@@ -1857,7 +1857,7 @@ class Wind(icounter.distributions.Weibull):
         return model
 
 
-class WindFull(icounter.distributions.Weibull):
+class WindFull(attrici.distributions.Weibull):
 
     """ Influence of GMT is modelled through a shift of
     the scale parameter beta in the Weibull distribution. The shape
@@ -1911,7 +1911,7 @@ class WindFull(icounter.distributions.Weibull):
         return model
 
 
-class WindLogistic(icounter.distributions.Weibull):
+class WindLogistic(attrici.distributions.Weibull):
 
     """ Influence of GMT is modelled through a shift of
     the scale parameter beta in the Weibull distribution. The shape

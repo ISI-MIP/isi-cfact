@@ -3,8 +3,8 @@ import pandas as pd
 import pathlib
 import sys
 import netCDF4 as nc
-import icounter.const as c
-import icounter.fourier as fourier
+import attrici.const as c
+import attrici.fourier as fourier
 
 
 def create_output_dirs(output_dir):
@@ -89,7 +89,7 @@ def create_dataframe(nct_array, units, data_to_detrend, gmt, variable):
 
 
 def create_dataframe_extended(nct_array,
-                              units, 
+                              units,
                               dataframe_nonextended,
                               data_extended,
                               last_gmt_value,

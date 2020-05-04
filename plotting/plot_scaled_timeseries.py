@@ -3,9 +3,9 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 from plotting.helper_functions import get_parser
-import icounter.const as c
+import attrici.const as c
 import scipy.stats as stats
-import icounter.estimator as est
+import attrici.estimator as est
 
 
 def plot_scaled_timeseries(

@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import subprocess
-import icounter.postprocess as pp
+import attrici.postprocess as pp
 import settings as s
 
 # options for postprocess

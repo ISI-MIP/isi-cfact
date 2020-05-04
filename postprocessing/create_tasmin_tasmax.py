@@ -2,7 +2,7 @@ import subprocess
 from pathlib import Path
 
 """ This code allows to create tasmax and tasmin from tas, tasrange and
-    tasskew. It runs independent from the icounter package.
+    tasskew. It runs independent from the attrici package.
     Copy anywhere and adjust the variables below. """
 
 output_base = Path("/p/tmp/mengel/isimip/isi-cfact/output/")

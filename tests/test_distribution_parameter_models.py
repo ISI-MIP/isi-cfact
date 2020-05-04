@@ -1,14 +1,14 @@
 import numpy as np
 import pandas as pd
 import pymc3 as pm
-import icounter.models
+import attrici.models
 import pathlib
-import icounter.fourier as fourier
-import icounter.datahandler as dh
+import attrici.fourier as fourier
+import attrici.datahandler as dh
 import settings as s
 import pytest
-from icounter.models import *
-from icounter.distributions import *
+from attrici.models import *
+from attrici.distributions import *
 
 cwd = pathlib.Path.cwd()
 df = pd.read_hdf(cwd/"tests"/"data"/"ts_GSWP3_lat-20.25_lon-49.75.h5")

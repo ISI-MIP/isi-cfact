@@ -14,8 +14,8 @@ import numpy as np
 # import pandas as pd
 from datetime import datetime
 import subprocess
-import icounter
-import icounter.postprocess as pp
+import attrici
+import attrici.postprocess as pp
 import settings as s
 
 ### options for postprocess
@@ -95,7 +95,7 @@ if write_netcdf:
                 ncvar.setncattr(key, att)
 
 
-    outfile.setncattr("cfact_version", icounter.__version__)
+    outfile.setncattr("cfact_version", attrici.__version__)
     outfile.setncattr("runid", Path.cwd().name)
 
     for (i, j, dfpath) in itertools.zip_longest(lat_indices, lon_indices, data_list):

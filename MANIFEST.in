@@ -1,2 +1,2 @@
 include versioneer.py
-include icounter/_version.py
+include attrici/_version.py

@@ -4,10 +4,10 @@ import pandas as pd
 import pymc3 as pm
 from datetime import datetime
 
-import icounter.datahandler as dh
-import icounter.const as c
-import icounter.models as models
-import icounter.fourier as fourier
+import attrici.datahandler as dh
+import attrici.const as c
+import attrici.models as models
+import attrici.fourier as fourier
 
 model_for_var = {
     "tas": models.Tas,

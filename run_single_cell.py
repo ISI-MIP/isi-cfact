@@ -5,12 +5,12 @@ from datetime import datetime
 from pathlib import Path
 import pandas as pd
 from func_timeout import func_timeout, FunctionTimedOut
-import icounter
-import icounter.estimator as est
-import icounter.datahandler as dh
+import attrici
+import attrici.estimator as est
+import attrici.datahandler as dh
 import settings as s
 
-print("Version", icounter.__version__)
+print("Version", attrici.__version__)
 
 
 lat = 69.75

@@ -1,13 +1,13 @@
 import os
 import settings as s
-import icounter
-import icounter.datahandler as dh
+import attrici
+import attrici.datahandler as dh
 import netCDF4 as nc
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from icounter.estimator import model_for_var
-import icounter.const as c
+from attrici.estimator import model_for_var
+import attrici.const as c
 import logging
 
 
@@ -54,7 +54,7 @@ logger = logging.getLogger(__name__)
 pmlogger = logging.getLogger("pymc3")
 pmlogger.propagate = False
 
-print("Version", icounter.__version__)
+print("Version", attrici.__version__)
 
 try:
     submitted = os.environ["SUBMITTED"] == "1"

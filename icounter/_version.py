@@ -41,8 +41,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = "v"
-    cfg.parentdir_prefix = "icounter-"
-    cfg.versionfile_source = "icounter/_version.py"
+    cfg.parentdir_prefix = "attrici-"
+    cfg.versionfile_source = "attrici/_version.py"
     cfg.verbose = False
     return cfg
 
