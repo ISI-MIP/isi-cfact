@@ -3,13 +3,11 @@
 #SBATCH --qos=short
 #SBATCH --partition=standard
 #SBATCH --account=isimip
-#SBATCH --mail-user=sitreu@pik-potsdam.de
-#SBATCH --mail-type=ALL,TIME_LIMIT
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --job-name=derive_huss
-#SBATCH --output=log/derive_huss.%j.log
-#SBATCH --error=log/derive_huss.%j.log
+#SBATCH --output=derive_huss.%j.log
+#SBATCH --error=derive_huss.%j.log
 
 function get_cdoexpr_huss_Weedon2010style {
   # returns the cdo expression that calculates specific humidity from

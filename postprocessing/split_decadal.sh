@@ -4,15 +4,13 @@
 #SBATCH --partition=standard
 #SBATCH --job-name=isicf_split_to_decades
 #SBATCH --account=isimip
-#SBATCH --output=log/%x.log
-#SBATCH --error=log/%x.log
-#SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=sitreu@pik-potsdam.de
-
-# block one node to have enough memory
+#SBATCH --output=%x.log
+#SBATCH --error=%x.log
 #SBATCH --ntasks=1
 
 data_dir=/p/projects/isimip/isimip/sitreu/data/attrici/20201205_IsimipCounterfactualGSWP3-W5E5-revised/daily/
+mkdir $data_dir/decadal_data
+
 for input_file in ${data_dir}/*1901_2016_intermediate.nc
 do
   var=$(echo ${input_file} |  awk -F '_' '{print $4}')
